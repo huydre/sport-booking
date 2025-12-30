@@ -15,6 +15,7 @@ import { ResetPasswordDto } from './dto/reset-password.dto';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { AUTH } from '../../shared/constants';
 import { JwtPayload, TokenPair } from '../../shared/interfaces';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class AuthService {
@@ -23,6 +24,7 @@ export class AuthService {
         private readonly usersService: UsersService,
         private readonly jwtService: JwtService,
         private readonly configService: ConfigService,
+        private readonly mailService: MailService,
     ) { }
 
     async register(registerDto: RegisterDto) {
@@ -58,8 +60,8 @@ export class AuthService {
             },
         });
 
-        // TODO: Send OTP email
-        // await this.emailService.sendOtpEmail(email, otpCode);
+        // Send OTP email
+        await this.mailService.sendOtpEmail(email, name, otpCode);
 
         return {
             message: 'Registration successful. Please verify your email with OTP.',
@@ -207,8 +209,8 @@ export class AuthService {
             data: { resetToken, resetExpiresAt },
         });
 
-        // TODO: Send reset email
-        // await this.emailService.sendResetPasswordEmail(email, resetToken);
+        // Send reset email
+        await this.mailService.sendResetPasswordEmail(email, user.name, resetToken);
 
         return { message: 'If email exists, a reset link will be sent' };
     }

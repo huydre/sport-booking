@@ -9,6 +9,7 @@ import {
   databaseConfig,
   jwtConfig,
   redisConfig,
+  mailConfig,
 } from './config';
 
 // Database
@@ -19,13 +20,14 @@ import { AuthModule } from './modules/auth/auth.module';
 import { UsersModule } from './modules/users/users.module';
 import { VenuesModule } from './modules/venues/venues.module';
 import { BookingsModule } from './modules/bookings/bookings.module';
+import { MailModule } from './modules/mail/mail.module';
 
 @Module({
   imports: [
     // Configuration
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [appConfig, databaseConfig, jwtConfig, redisConfig],
+      load: [appConfig, databaseConfig, jwtConfig, redisConfig, mailConfig],
       envFilePath: ['.env.local', '.env'],
     }),
 
