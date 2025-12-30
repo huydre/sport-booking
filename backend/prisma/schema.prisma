@@ -1,0 +1,206 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== ENUMS ====================
+
+enum Role {
+  CUSTOMER
+  OWNER
+  ADMIN
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  COMPLETED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+enum SportType {
+  FOOTBALL
+  BADMINTON
+  TENNIS
+  BASKETBALL
+  VOLLEYBALL
+  SWIMMING
+  OTHER
+}
+
+enum VenueStatus {
+  ACTIVE
+  INACTIVE
+  MAINTENANCE
+}
+
+// ==================== MODELS ====================
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  password      String?
+  name          String
+  phone         String?
+  avatar        String?
+  role          Role      @default(CUSTOMER)
+  isVerified    Boolean   @default(false)
+  isActive      Boolean   @default(true)
+  googleId      String?   @unique
+  
+  // OTP verification
+  otpCode       String?
+  otpExpiresAt  DateTime?
+  
+  // Password reset
+  resetToken    String?
+  resetExpiresAt DateTime?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  venues        Venue[]         @relation("OwnerVenues")
+  bookings      Booking[]
+  notifications Notification[]
+  refreshTokens RefreshToken[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id          String   @id @default(uuid())
+  token       String   @unique
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+model Venue {
+  id           String      @id @default(uuid())
+  name         String
+  description  String?
+  address      String
+  latitude     Decimal
+  longitude    Decimal
+  sportType    SportType
+  pricePerHour Decimal
+  openingTime  String      // Format: "HH:mm"
+  closingTime  String      // Format: "HH:mm"
+  images       String[]
+  amenities    String[]
+  status       VenueStatus @default(ACTIVE)
+  
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  // Relations
+  ownerId      String
+  owner        User        @relation("OwnerVenues", fields: [ownerId], references: [id])
+  bookings     Booking[]
+
+  @@map("venues")
+}
+
+model Booking {
+  id           String        @id @default(uuid())
+  bookingCode  String        @unique @default(cuid())
+  startTime    DateTime
+  endTime      DateTime
+  totalAmount  Decimal
+  status       BookingStatus @default(PENDING)
+  isRecurring  Boolean       @default(false)
+  notes        String?
+  
+  // For recurring bookings
+  recurringGroupId String?
+  
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  // Relations
+  userId       String
+  user         User          @relation(fields: [userId], references: [id])
+  venueId      String
+  venue        Venue         @relation(fields: [venueId], references: [id])
+  payment      Payment?
+
+  @@index([userId])
+  @@index([venueId])
+  @@index([startTime, endTime])
+  @@map("bookings")
+}
+
+model Payment {
+  id            String        @id @default(uuid())
+  amount        Decimal
+  method        String        // vnpay, momo, zalopay, bank_transfer
+  transactionId String?
+  status        PaymentStatus @default(PENDING)
+  paidAt        DateTime?
+  metadata      Json?
+  
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  bookingId     String        @unique
+  booking       Booking       @relation(fields: [bookingId], references: [id])
+
+  @@map("payments")
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  type      String   // booking_confirmed, booking_cancelled, payment_success, reminder
+  isRead    Boolean  @default(false)
+  metadata  Json?
+  
+  createdAt DateTime @default(now())
+
+  // Relations
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@map("notifications")
+}
+
+model AuditLog {
+  id         String   @id @default(uuid())
+  userId     String?
+  action     String
+  resource   String
+  resourceId String?
+  oldValue   Json?
+  newValue   Json?
+  ipAddress  String?
+  userAgent  String?
+  
+  createdAt  DateTime @default(now())
+
+  @@index([userId])
+  @@index([resource, resourceId])
+  @@map("audit_logs")
+}
