@@ -1,0 +1,124 @@
+# ===========================
+# Dependencies
+# ===========================
+node_modules/
+.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# ===========================
+# Build & Compiled Output
+# ===========================
+/dist
+/build
+.next/
+out/
+*.tsbuildinfo
+
+# ===========================
+# Testing
+# ===========================
+/coverage
+/.nyc_output
+
+# ===========================
+# Environment Variables
+# ===========================
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# ===========================
+# Logs
+# ===========================
+logs/
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# ===========================
+# Runtime & Temp
+# ===========================
+.temp/
+.tmp/
+tmp/
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ===========================
+# OS Generated Files
+# ===========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===========================
+# IDEs and Editors
+# ===========================
+.idea/
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+*.sublime-project
+*.swp
+*.swo
+*~
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/*.code-snippets
+
+# ===========================
+# Next.js Specific
+# ===========================
+.next/
+out/
+.swc/
+next-env.d.ts
+
+# ===========================
+# NestJS Specific
+# ===========================
+/dist
+*.js.map
+*.d.ts
+
+# ===========================
+# Database
+# ===========================
+*.sqlite
+*.sqlite3
+*.db
+prisma/migrations/*.sql.backup
+
+# ===========================
+# Debug
+# ===========================
+.debug/
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# ===========================
+# Misc
+# ===========================
+*.tgz
+.eslintcache
+.cache/
+.parcel-cache/
+.turbo/
